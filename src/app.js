@@ -9,6 +9,7 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
     'https://vshhospital.netlify.app',
+    'https://vsh-backend-25m1.onrender.com',
 ];
 
 app.use(cors({
