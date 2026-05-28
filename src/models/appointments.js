@@ -41,6 +41,20 @@ const appointmentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+      default: 'pending',
+    },
+    adminNotes: {
+      type: String,
+    },
+    userId: {
+      type: String,
+    },
+    bookedAt: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

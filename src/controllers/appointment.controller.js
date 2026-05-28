@@ -1,4 +1,5 @@
 const Appointment = require("../models/appointments");
+const { sendAppointmentNotifications } = require("../utils/notifications");
 
 /**
  * @desc Create new appointment
@@ -8,6 +9,13 @@ exports.createAppointment = async (req, res) => {
   try {
     const appointment = new Appointment(req.body);
     await appointment.save();
+
+    // Send notifications (email, webhook) - don't block response if failing
+    try {
+      await sendAppointmentNotifications(req.body);
+    } catch (notifyError) {
+      console.error("Notification error (non-blocking):", notifyError.message);
+    }
 
     res.status(201).json({
       success: true,
