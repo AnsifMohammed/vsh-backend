@@ -22,6 +22,17 @@ const {
   deleteAppointment,
   getAppointmentDetails
 } = require("../controllers/admin.controller");
+const {
+  createBlog,
+  getAllBlogs,
+  getBlogById,
+  updateBlog,
+  deleteBlog,
+  togglePublishStatus,
+  getBlogStats,
+  getPublishedBlogs,
+  getBlogBySlug
+} = require("../controllers/blog.controller");
 
 
 //Auth
@@ -72,4 +83,18 @@ router.get("/ovulation", getLatestOvulationPrediction);
 router.post("/appointments", createAppointment);      // POST
 router.get("/appointments", getAppointments);          // GET all
 router.get("/appointments/:id", getAppointmentById);
+
+// Public Blog routes
+router.get('/blogs', getPublishedBlogs);
+router.get('/blogs/:slug', getBlogBySlug);
+
+// Admin Blog routes
+router.post('/admin/blogs', checkAdmin, createBlog);
+router.get('/admin/blogs', checkAdmin, getAllBlogs);
+router.get('/admin/blogs/stats', checkAdmin, getBlogStats);
+router.get('/admin/blogs/:id', checkAdmin, getBlogById);
+router.put('/admin/blogs/:id', checkAdmin, updateBlog);
+router.delete('/admin/blogs/:id', checkAdmin, deleteBlog);
+router.put('/admin/blogs/:id/publish', checkAdmin, togglePublishStatus);
+
 module.exports = router;
