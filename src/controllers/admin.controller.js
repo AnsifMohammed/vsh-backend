@@ -1,5 +1,7 @@
 const Appointment = require("../models/appointments");
 const User = require("../models/user");
+const Blog = require("../models/blog");
+const Doctor = require("../models/doctor");
 
 /**
  * @desc Get admin dashboard stats
@@ -37,6 +39,12 @@ exports.getAdminStats = async (req, res) => {
     // Get total users
     const totalUsers = await User.countDocuments();
 
+    // Get total blogs
+    const totalBlogs = await Blog.countDocuments();
+
+    // Get total doctors
+    const totalDoctors = await Doctor.countDocuments();
+
     // Get appointments by specialty
     const appointmentsBySpecialty = await Appointment.aggregate([
       {
@@ -61,7 +69,9 @@ exports.getAdminStats = async (req, res) => {
           totalAppointments,
           todayAppointments,
           upcomingAppointments,
-          totalUsers
+          totalUsers,
+          totalBlogs,
+          totalDoctors
         },
         appointmentsBySpecialty,
         recentAppointments

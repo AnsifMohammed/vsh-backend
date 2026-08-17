@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
 /**
  * @desc User signup
@@ -116,6 +117,13 @@ exports.login = async (req, res) => {
       });
     }
 
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     // Create user response object with explicit role
     const userResponse = {
       _id: user._id,
@@ -124,6 +132,7 @@ exports.login = async (req, res) => {
       phoneNumber: user.phoneNumber,
       dateOfBirth: user.dateOfBirth,
       role: user.role,
+      token,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -185,14 +194,12 @@ exports.forgotPassword = async (req, res) => {
     // Create reset URL (you'll use this in your frontend)
     const resetUrl = `${req.protocol}://${req.get("host")}/resetpassword?token=${resetToken}`;
 
+    // Print to console in development
+    console.log(`\n🔑 [Password Reset Link] for ${user.email}:\n${resetUrl}\n`);
+
     res.status(200).json({
       success: true,
       message: "Password reset link has been sent. Link is valid for 24 hours.",
-      data: {
-        resetToken, // Send this to frontend for development
-        resetUrl,   // Use this for email link
-        email: user.email,
-      },
     });
 
     // TODO: In production, send email with resetUrl instead of returning it

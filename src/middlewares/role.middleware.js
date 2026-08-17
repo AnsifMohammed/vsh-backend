@@ -1,29 +1,38 @@
-// NOTE: This is client-side only protection for now.
-// In production, implement proper JWT-based authentication.
-// 
-// For proper implementation:
-// 1. npm install jsonwebtoken
-// 2. Add JWT verification in middleware
-// 3. Check role from decoded token
+const jwt = require("jsonwebtoken");
 
 /**
- * Admin check middleware (placeholder)
- * Currently passes through all requests - implement JWT for production
+ * Admin check middleware
+ * Verifies JWT token from Authorization header and checks if role === 'admin'
  */
 const checkAdmin = (req, res, next) => {
-  // Placeholder: In production, verify JWT token from Authorization header
-  // and check if user.role === 'admin'
-  // 
-  // Example:
-  // const token = req.headers.authorization?.split(' ')[1];
-  // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  // if (decoded.role !== 'admin') {
-  //   return res.status(403).json({ message: 'Admin access required' });
-  // }
-  // req.user = decoded;
-  
-  // For now: Allow all requests (client-side protection only)
-  next();
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Access denied. No token provided.",
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin role required.",
+      });
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token.",
+      error: error.message,
+    });
+  }
 };
 
-module.exports = checkAdmin;
+module.exports = checkAdmin;

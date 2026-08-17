@@ -1,6 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const checkAdmin = require('../middlewares/role.middleware');
+const {
+  getDoctors,
+  getDoctorById,
+  createDoctor,
+  updateDoctor,
+  deleteDoctor,
+  updateDoctorOrders
+} = require("../controllers/doctor.controller");
 const { getCounters, addCounters, updateCounters, deleteCounters } = require('../controllers/counter.controller');
 const {createRequest,getAllRequests,getRequestById,updateRequest,deleteRequest} = require('../controllers/consultation.controller')
 const {createCyclePrediction,getLatestCyclePrediction} = require("../controllers/menstrualcycletracker.controller");
@@ -81,8 +89,8 @@ router.get("/ovulation", getLatestOvulationPrediction);
 
 
 router.post("/appointments", createAppointment);      // POST
-router.get("/appointments", getAppointments);          // GET all
-router.get("/appointments/:id", getAppointmentById);
+router.get("/appointments", checkAdmin, getAppointments);          // GET all
+router.get("/appointments/:id", checkAdmin, getAppointmentById);
 
 // Public Blog routes
 router.get('/blogs', getPublishedBlogs);
@@ -96,5 +104,15 @@ router.get('/admin/blogs/:id', checkAdmin, getBlogById);
 router.put('/admin/blogs/:id', checkAdmin, updateBlog);
 router.delete('/admin/blogs/:id', checkAdmin, deleteBlog);
 router.put('/admin/blogs/:id/publish', checkAdmin, togglePublishStatus);
+
+// Public Doctor routes
+router.get('/doctors', getDoctors);
+router.get('/doctors/:id', getDoctorById);
+
+// Admin Doctor routes
+router.post('/admin/doctors', checkAdmin, createDoctor);
+router.put('/admin/doctors/reorder', checkAdmin, updateDoctorOrders);
+router.put('/admin/doctors/:id', checkAdmin, updateDoctor);
+router.delete('/admin/doctors/:id', checkAdmin, deleteDoctor);
 
 module.exports = router;
