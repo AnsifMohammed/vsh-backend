@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const PregnancySchema = new mongoose.Schema(
   {
     lastMenstrualPeriod: { type: Date, required: true },
-    cycleLength: { type: Number, default: 28 },
+    cycleLength: { type: Number, default: 28, min: [1, "Cycle length must be at least 1 day"] },
 
     pregnancyWeek: Number,
     trimester: String,

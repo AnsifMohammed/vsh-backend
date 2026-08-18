@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../utils/notifications");
 
 /**
  * @desc User signup
@@ -191,19 +192,58 @@ exports.forgotPassword = async (req, res) => {
     
     await user.save();
 
-    // Create reset URL (you'll use this in your frontend)
-    const resetUrl = `${req.protocol}://${req.get("host")}/resetpassword?token=${resetToken}`;
+    // Compute frontend base URL (supporting localhost:5173 / production)
+    const origin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : "");
+    const frontendBase = process.env.FRONTEND_URL || origin || "http://localhost:5173";
+    const resetUrl = `${frontendBase}/resetpassword?token=${resetToken}`;
 
-    // Print to console in development
+    // Log to console for debugging/development
     console.log(`\n🔑 [Password Reset Link] for ${user.email}:\n${resetUrl}\n`);
+
+    // Send email via Brevo
+    try {
+      const emailSent = await sendEmail({
+        toEmail: user.email,
+        toName: user.name || user.email,
+        subject: "Password Reset Request - Vayushri Hospital",
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; background: #ffffff; border: 1px solid #e9d5ff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="background: linear-gradient(135deg, #6B3FA0 0%, #4A247A 100%); padding: 30px; text-align: center;">
+              <h2 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold;">Vayushri Hospital</h2>
+              <p style="color: #e9d5ff; margin: 8px 0 0 0; font-size: 14px;">Password Reset Request</p>
+            </div>
+            
+            <div style="padding: 30px 25px;">
+              <p style="color: #333333; font-size: 16px; margin-top: 0;">Hello <strong>${user.name || "there"}</strong>,</p>
+              <p style="color: #555555; font-size: 14px; line-height: 1.6;">We received a request to reset your password for your Vayushri Hospital portal account. Click the button below to create a new password:</p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="background: linear-gradient(135deg, #6B3FA0 0%, #7C3AED 100%); color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(107, 63, 160, 0.4);">Reset My Password</a>
+              </div>
+              
+              <div style="background: #faf5ff; border: 1px solid #f3e8ff; border-radius: 8px; padding: 12px; margin: 20px 0;">
+                <p style="margin: 0; color: #6b21a8; font-size: 12px;"><strong>Note:</strong> This reset link is valid for <strong>24 hours</strong>. If you did not make this request, you can safely ignore this email.</p>
+              </div>
+              
+              <p style="color: #777777; font-size: 12px; margin-top: 25px; border-top: 1px solid #eeeeee; padding-top: 15px;">
+                Need assistance? Call our 24/7 help desk at <strong>+91 77085 55635</strong> or email <strong>vyushriivfhospital@gmail.com</strong>.
+              </p>
+            </div>
+          </div>
+        `,
+      });
+
+      if (!emailSent) {
+        console.warn(`⚠️ [Brevo] Email dispatch returned false for ${user.email}`);
+      }
+    } catch (emailErr) {
+      console.error("❌ Password reset email dispatch error:", emailErr.message);
+    }
 
     res.status(200).json({
       success: true,
-      message: "Password reset link has been sent. Link is valid for 24 hours.",
+      message: "Password reset link has been sent to your email. Link is valid for 24 hours.",
     });
-
-    // TODO: In production, send email with resetUrl instead of returning it
-    // Example: await sendEmail({ email: user.email, subject: 'Password Reset', resetUrl });
 
   } catch (error) {
     res.status(500).json({

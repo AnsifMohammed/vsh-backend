@@ -2,11 +2,13 @@ const Ovulation = require("../models/ovulation");
 
 exports.createOvulationPrediction = async (req, res) => {
   try {
-    const { firstDayOfLastPeriod, cycleLength } = req.body;
+    const { cycleLength } = req.body;
+    const firstDayOfLastPeriod = req.body.firstDayOfLastPeriod || req.body.lastPeriodDate || req.body.lastMenstrualPeriod;
+    const numCycleLength = Number(cycleLength || 28);
 
-    if (!firstDayOfLastPeriod || !cycleLength) {
+    if (!firstDayOfLastPeriod || isNaN(numCycleLength) || numCycleLength <= 0) {
       return res.status(400).json({
-        message: "First day of last period and cycle length are required"
+        message: "First day of last period and positive cycle length are required"
       });
     }
 
@@ -14,7 +16,7 @@ exports.createOvulationPrediction = async (req, res) => {
 
     // Ovulation ≈ cycleLength - 14
     const ovulationDate = new Date(startDate);
-    ovulationDate.setDate(startDate.getDate() + (cycleLength - 14));
+    ovulationDate.setDate(startDate.getDate() + (numCycleLength - 14));
 
     const fertileWindowStart = new Date(ovulationDate);
     fertileWindowStart.setDate(ovulationDate.getDate() - 4);

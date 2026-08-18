@@ -4,13 +4,15 @@ const BMI = require("../models/bmi");
 exports.createBMICalculation = async (req, res) => {
   try {
     const { height, weight } = req.body;
+    const numHeight = Number(height);
+    const numWeight = Number(weight);
 
-    if (!height || !weight) {
-      return res.status(400).json({ message: "Height and weight are required" });
+    if (!height || !weight || isNaN(numHeight) || isNaN(numWeight) || numHeight <= 0 || numWeight <= 0) {
+      return res.status(400).json({ message: "Valid positive height and weight are required" });
     }
 
-    const heightM = height / 100;
-    const bmiValue = weight / (heightM * heightM);
+    const heightM = numHeight / 100;
+    const bmiValue = numWeight / (heightM * heightM);
 
     let category = "";
     let message = "";

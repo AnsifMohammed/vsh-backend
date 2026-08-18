@@ -8,7 +8,8 @@ const cycleTrackerSchema = new mongoose.Schema(
     },
     cycleLength: {
       type: Number,
-      required: true
+      required: true,
+      min: [1, "Cycle length must be at least 1 day"]
     },
     nextPeriodDate: Date,
     ovulationDate: Date,

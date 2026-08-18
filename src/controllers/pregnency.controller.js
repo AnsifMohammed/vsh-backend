@@ -107,14 +107,20 @@ const getGrowthData = (week) => {
 
 exports.createPregnancyPrediction = async (req, res) => {
   try {
-    const { lastMenstrualPeriod, cycleLength } = req.body;
+    const { cycleLength } = req.body;
+    const lastMenstrualPeriod = req.body.lastMenstrualPeriod || req.body.lastPeriodDate || req.body.firstDayOfLastPeriod;
 
     if (!lastMenstrualPeriod) {
       return res.status(400).json({ message: "Last menstrual period is required" });
     }
 
+    const numCycleLength = cycleLength ? Number(cycleLength) : 28;
+    if (isNaN(numCycleLength) || numCycleLength <= 0) {
+      return res.status(400).json({ message: "Cycle length must be a positive number" });
+    }
+
     const start = new Date(lastMenstrualPeriod);
-    start.setDate(start.getDate() + ((cycleLength || 28) - 28));
+    start.setDate(start.getDate() + (numCycleLength - 28));
 
     const today = new Date();
     const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));

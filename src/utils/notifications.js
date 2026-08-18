@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
  */
 const sendEmail = async ({ toEmail, toName, subject, htmlContent }) => {
   const brevoApiKey = process.env.BREVO_API_KEY;
-  const senderEmail = process.env.SENDER_EMAIL || process.env.EMAIL_USER || 'info@vayushrihospital.com';
+  const senderEmail = process.env.SENDER_EMAIL || process.env.EMAIL_USER || 'vyushriivfhospital@gmail.com';
   const senderName = process.env.SENDER_NAME || 'Vayushri Hospital';
 
   // 1. Try Brevo REST API v3
@@ -75,12 +75,12 @@ const sendEmail = async ({ toEmail, toName, subject, htmlContent }) => {
  * Send email notification to hospital admin
  */
 const sendHospitalNotification = async (appointmentData) => {
-  const hospitalEmail = process.env.HOSPITAL_EMAIL || 'info@vayushrihospital.com';
+  const hospitalEmail = process.env.HOSPITAL_EMAIL || 'vyushriivfhospital@gmail.com';
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: linear-gradient(135deg, #6B3FA0 0%, #7A48B7 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h2 style="color: white; margin: 0;">🏥 New Appointment Booking</h2>
+        <h2 style="color: white; margin: 0;">New Appointment Booking</h2>
       </div>
       
       <div style="padding: 30px; background: #f9f9f9; border-radius: 0 0 10px 10px; border: 1px solid #eee;">
@@ -139,7 +139,7 @@ const sendHospitalNotification = async (appointmentData) => {
   return sendEmail({
     toEmail: hospitalEmail,
     toName: 'Vayushri Hospital Admin',
-    subject: `🏥 New Appointment: ${appointmentData.fullName} (${appointmentData.specialty})`,
+    subject: `New Appointment: ${appointmentData.fullName} (${appointmentData.specialty})`,
     htmlContent,
   });
 };
@@ -156,7 +156,7 @@ const sendUserConfirmation = async (appointmentData) => {
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: linear-gradient(135deg, #6B3FA0 0%, #7A48B7 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h2 style="color: white; margin: 0;">Appointment Confirmed! 🎉</h2>
+        <h2 style="color: white; margin: 0;">Appointment Confirmed</h2>
       </div>
       
       <div style="padding: 30px; background: #f9f9f9; border-radius: 0 0 10px 10px; border: 1px solid #eee;">
@@ -186,7 +186,7 @@ const sendUserConfirmation = async (appointmentData) => {
         </div>
         
         <div style="background: #f3e8ff; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #6B3FA0;">
-          <p style="margin: 0; color: #4A247A; font-weight: bold;">📍 Location & Address:</p>
+          <p style="margin: 0; color: #4A247A; font-weight: bold;">Location & Address:</p>
           <p style="margin: 5px 0 0 0; color: #333;">
             <strong>Vayushri Hospital</strong><br>
             200 feet radial road, Opp to Embassy, Pallavaram<br>
@@ -206,13 +206,13 @@ const sendUserConfirmation = async (appointmentData) => {
         
         <div style="margin-top: 30px; padding: 15px; background: #fff3cd; border-radius: 5px;">
           <p style="margin: 0; color: #856404; font-size: 14px;">
-            <strong>⚠️ Note:</strong> Please arrive 15 minutes before your scheduled slot. If you need to reschedule, call us at 7708555635.
+            <strong>Note:</strong> Please arrive 15 minutes before your scheduled slot. If you need to reschedule, call us at +91 77085 55635.
           </p>
         </div>
         
         <div style="margin-top: 30px; text-align: center;">
           <p style="color: #666;">Need help? Contact us:</p>
-          <p style="color: #333; font-weight: bold;">📞 +91 77085 55635 | 📧 info@vayushrihospital.com</p>
+          <p style="color: #333; font-weight: bold;">Phone: +91 77085 55635 | Email: vyushriivfhospital@gmail.com</p>
         </div>
       </div>
     </div>
@@ -290,6 +290,7 @@ const sendAppointmentNotifications = async (appointmentData) => {
 };
 
 module.exports = {
+  sendEmail,
   sendAppointmentNotifications,
   sendHospitalNotification,
   sendUserConfirmation,

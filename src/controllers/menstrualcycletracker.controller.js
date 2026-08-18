@@ -4,11 +4,11 @@ const MenstrualCycleTracker = require("../models/menstrualcycletracker");
 const createCyclePrediction = async (req, res) => {
   try {
     const { lastPeriodDate, cycleLength } = req.body;
-
-    if (!lastPeriodDate || !cycleLength) {
+    const numCycleLength = Number(cycleLength);
+    if (!lastPeriodDate || !cycleLength || isNaN(numCycleLength) || numCycleLength <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Last period date and cycle length are required"
+        message: "A valid last period date and positive cycle length are required"
       });
     }
 
@@ -16,7 +16,7 @@ const createCyclePrediction = async (req, res) => {
 
     // Calculations
     const nextPeriodDate = new Date(lastDate);
-    nextPeriodDate.setDate(lastDate.getDate() + cycleLength);
+    nextPeriodDate.setDate(lastDate.getDate() + numCycleLength);
 
     const ovulationDate = new Date(nextPeriodDate);
     ovulationDate.setDate(nextPeriodDate.getDate() - 14);

@@ -9,8 +9,28 @@ const getCounters = async (req, res) => {
   }
 };
 
+const validateCounterValues = (data) => {
+  const fields = ['familiesHelped', 'babiesDelivered', 'yearsExperience', 'googleRating'];
+  for (const field of fields) {
+    if (data[field] !== undefined) {
+      const val = Number(data[field]);
+      if (isNaN(val) || val < 0) {
+        return `${field} cannot be negative`;
+      }
+      if (field === 'googleRating' && val > 5) {
+        return 'googleRating cannot exceed 5';
+      }
+    }
+  }
+  return null;
+};
+
 const addCounters = async (req, res) => {
   try {
+    const errorMsg = validateCounterValues(req.body);
+    if (errorMsg) {
+      return res.status(400).json({ success: false, message: errorMsg });
+    }
     const counter = await Counter.create(req.body);
     res.status(201).json({ success: true, data: counter });
   } catch (error) {
@@ -21,6 +41,11 @@ const addCounters = async (req, res) => {
 const updateCounters = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const errorMsg = validateCounterValues(req.body);
+    if (errorMsg) {
+      return res.status(400).json({ success: false, message: errorMsg });
+    }
 
     const updatedCounter = await Counter.findByIdAndUpdate(
       id,
