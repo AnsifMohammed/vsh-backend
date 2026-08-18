@@ -13,9 +13,6 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With']
 }));
 
-// Handle preflight OPTIONS requests for all routes
-app.options('*', cors());
-
 const connectDB = require('./config/db');
 
 // Ensure database connection on each serverless invocation
